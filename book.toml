@@ -1,0 +1,6 @@
+[book]
+authors = ["masha"]
+language = "zh"
+multilingual = false
+src = "src"
+title = "《深入剖析Kubernetes》学习笔记"
