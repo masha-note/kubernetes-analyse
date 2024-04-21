@@ -3,8 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>《深入剖析Kubernetes》学习笔记</title>
-        <meta name="robots" content="noindex">
+        <title>隔离与限制 - 《深入剖析Kubernetes》学习笔记</title>
 
 
         <!-- Custom HTML head -->
@@ -89,7 +88,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> 背景</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">2.</strong> 容器技术基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="chapter_2_1.html"><strong aria-hidden="true">2.1.</strong> 从进程开始说起</a></li><li class="chapter-item expanded "><a href="chapter_2_2.html"><strong aria-hidden="true">2.2.</strong> 隔离与限制</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> 背景</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">2.</strong> 容器技术基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="chapter_2_1.html"><strong aria-hidden="true">2.1.</strong> 从进程开始说起</a></li><li class="chapter-item expanded "><a href="chapter_2_2.html" class="active"><strong aria-hidden="true">2.2.</strong> 隔离与限制</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -174,61 +173,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="1-背景回顾云原生大事记"><a class="header" href="#1-背景回顾云原生大事记">1 背景回顾：云原生大事记</a></h1>
-<p>介绍了容器技术和PAAS的历史背景，讲的很通俗易懂，建议阅读原文第一章。</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="2-容器技术基础"><a class="header" href="#2-容器技术基础">2 容器技术基础</a></h1>
-<h2 id="21-从进程开始说起"><a class="header" href="#21-从进程开始说起"><a href="https://masha-note.github.io/kubernetes-analyse/chapter_2_1.html">2.1 从进程开始说起</a></a></h2>
-<h2 id="22-隔离与限制"><a class="header" href="#22-隔离与限制"><a href="https://masha-note.github.io/kubernetes-analyse/chapter_2_2.html">2.2 隔离与限制</a></a></h2>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="21-从进程开始说起-1"><a class="header" href="#21-从进程开始说起-1">2.1 从进程开始说起</a></h1>
-<p>容器本身的价值非常有限，真正有价值的是“容器编排”。</p>
-<p>一个程序运行起来之后的计算机执行环境的总和就是进程。</p>
-<p><strong>容器是怎么一回事儿？</strong></p>
-<p>容器技术的核心功能，就是通过约束和修改进程的动态表现，为其创造一个“边界”。对于<code>Docker</code>等大多数Linux容器来说，<code>Cgroups</code>技术是用来制造约束的主要手段，而<code>Namespace</code>技术是用来修改进程视图的主要方法。</p>
-<p><strong>理解Cgroups和Namespace</strong></p>
-<p>首先创建一个容器</p>
-<pre><code class="language-shell">masha@MaSha_PC:~$ docker run -it busybox /bin/sh
-Unable to find image 'busybox:latest' locally
-latest: Pulling from library/busybox
-7b2699543f22: Pull complete
-Digest: sha256:c3839dd800b9eb7603340509769c43e146a74c63dca3045a8e7dc8ee07e53966
-Status: Downloaded newer image for busybox:latest
-/ #
-</code></pre>
-<p><code>-it</code>参数告诉了Docker项目在启动容器后，需要给我们分配一个文本输入/输出环境，即<a href="https://docs.kernel.org/driver-api/tty/index.html">TTY</a>，跟容器的标准输入相关联，这样我们就可以和这个Docker容器进行交互了。而/bin/sh就是我们要在Docker容器里运行的程序。</p>
-<p>如此一来，我们的Linux机器就变成了宿主机，而一个运行着/bin/sh的容器就在这个宿主机里运行了。</p>
-<pre><code class="language-shell">/ # ps
-PID   USER     TIME  COMMAND
-    1 root      0:00 /bin/sh
-    7 root      0:00 ps
-</code></pre>
-<p>在容器里面执行ps可以看到在Docker里最开始执行的/bin/sh就是1号进程，另一个进程是我们刚刚执行的ps，这意味着/bin/sh和ps已经被Docker隔离在了一个跟宿主机完全不同的空间中了(看不到宿主机的进程)。</p>
-<p><strong>怎么做到隔离的？</strong></p>
-<p>这就是Namespace的作用。Namesapce其实只是Linux创建新进程的一个可选参数。在Linux系统中创建线程的系统调用是<code>clone()</code>，比如</p>
-<pre><code class="language-C">int pid = clone(main_function, stack_size, SIGCHLD, NULL);
-</code></pre>
-<p>这回为我们创建一个新的进程并返回他的PID。而当我们用<code>clone()</code>系统调用创建一个新进程时，就可以在参数中指定<code>CLONE_NEWPID</code>参数，比如：</p>
-<pre><code class="language-C">int pid = clone(main_function, stack_size, CLONE_NEWPID | SIGCHLD, NULL);
-</code></pre>
-<p>这时，新创建的进程会被隔离在一个全新的进程空间。在这个进程空间里，它的PID是1，但在宿主机真实的进程空间里，这个进程的PID还是它真是的数值(并非1)。</p>
-<p>如果多次执行上面的clone调用，就会创造出多个PID Namespace，每个Namespace都访问不了真实进程空间，也访问不了其他PID Namespace的进程空间。</p>
-<p>除了PID Namespace，Linux操作系统还提供了Mount、UTS、IPC、Network和User这些Namespace。比如，Mount Namesapce用于让被隔离进程只能访问到当前Namesapce的挂载点信息，NetWork Namespace用于让被隔离的进程只能访问当前Namespace里的网络设备和配置。</p>
-<p>关于Namespace：</p>
-<ul>
-<li>
-<p><a href="https://www.redhat.com/sysadmin/7-linux-namespaces">RED HAT关于7个常用Namespace的介绍</a></p>
-</li>
-<li>
-<p>Linux manual 的说明</p>
-<pre><code class="language-text">A namespace wraps a global system resource in an abstraction that makes it appear to the processes within the namespace that they have their own isolated instance of the global resource. 
-
-Changes to the global resource are visible to other processes that are members of the namespace, but are invisible to other processes.
-
-One use of namespaces is to implement containers.
-</code></pre>
-</li>
-</ul>
-<p>这就是Linux容器最基本的实现原理。可见，容器其实是一种特殊的进程。</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="22-隔离与限制-1"><a class="header" href="#22-隔离与限制-1">2.2 隔离与限制</a></h1>
+                        <h1 id="22-隔离与限制"><a class="header" href="#22-隔离与限制">2.2 隔离与限制</a></h1>
 <h2 id="关于隔离"><a class="header" href="#关于隔离">关于隔离</a></h2>
 <p>Linux容器使用Namespace技术来实现“隔离”。用户在容器里运行的应用进程跟宿主机的其他进程一样都由宿主机操作系统统一管理，只不过这些被隔离的进程拥有额外设置的Namespace参数。Docker不对这些进程负责，更多的是旁路式的辅助和管理。</p>
 <p>Docker不需要像Hypervisor那样创建虚拟机并运行一个完整的操作系统来执行用户的应用进程，避免了额外的资源消耗和占用。容器化后的用户进程依然是宿主机上的普通进程，不存在因为虚拟化而产生的性能损耗；使用Namespace作为隔离手段的容器也不需要单独的操作系统，因此容器额外的资源占用几乎可以忽略不计。</p>
@@ -379,6 +324,9 @@ a767eb791447   ubuntu    &quot;/bin/bash&quot;   43 seconds ago   Up 42 seconds 
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="chapter_2_1.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
 
                         <div style="clear: both"></div>
@@ -387,6 +335,9 @@ a767eb791447   ubuntu    &quot;/bin/bash&quot;   43 seconds ago   Up 42 seconds 
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="chapter_2_1.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
             </nav>
 
@@ -410,11 +361,6 @@ a767eb791447   ubuntu    &quot;/bin/bash&quot;   43 seconds ago   Up 42 seconds 
 
         <!-- Custom JS scripts -->
 
-        <script>
-        window.addEventListener('load', function() {
-            window.setTimeout(window.print, 100);
-        });
-        </script>
 
     </div>
     </body>
