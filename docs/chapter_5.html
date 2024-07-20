@@ -2,11 +2,12 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>背景 - 《深入剖析Kubernetes》学习笔记</title>
+        <title>kubernetes 编排原理 - 《深入剖析Kubernetes》学习笔记</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
+        <base href="">
 
         <link rel="stylesheet" href="book.css">
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
@@ -62,7 +63,7 @@
         </script>
 
         <div id="sidebar" class="sidebar">
-            <ul class="chapter"><li><a href="./chapter_1.html" class="active"><strong>1.</strong> 背景</a></li><li><a href="./chapter_2.html"><strong>2.</strong> 容器技术基础</a></li><li><ul class="section"><li><a href="./chapter_2_4.html"><strong>2.1.</strong> 重新认识 Linux 容器</a></li></ul></li><li><a href="./chapter_3.html"><strong>3.</strong> kubernetes 设计与架构</a></li><li><a href="./chapter_4.html"><strong>4.</strong> kubernetes 集群搭建与配置</a></li><li><a href="./chapter_5.html"><strong>5.</strong> kubernetes 编排原理</a></li></ul>
+            <ul class="chapter"><li><a href="./chapter_1.html"><strong>1.</strong> 背景</a></li><li><a href="./chapter_2.html"><strong>2.</strong> 容器技术基础</a></li><li><ul class="section"><li><a href="./chapter_2_4.html"><strong>2.1.</strong> 重新认识 Linux 容器</a></li></ul></li><li><a href="./chapter_3.html"><strong>3.</strong> kubernetes 设计与架构</a></li><li><a href="./chapter_4.html"><strong>4.</strong> kubernetes 集群搭建与配置</a></li><li><a href="./chapter_5.html" class="active"><strong>5.</strong> kubernetes 编排原理</a></li></ul>
         </div>
 
         <div id="page-wrapper" class="page-wrapper">
@@ -85,28 +86,29 @@
                 </div>
 
                 <div id="content" class="content">
-                    <a class="header" href="./chapter_1.html#1-背景回顾云原生大事记" id="1-背景回顾云原生大事记"><h1>1 背景回顾：云原生大事记</h1></a>
-<p>介绍了容器技术和PAAS的历史背景，讲的很通俗易懂，建议阅读原文第一章。</p>
+                    <a class="header" href="./chapter_5.html#kubernetes编排原理" id="kubernetes编排原理"><h1>kubernetes编排原理</h1></a>
+<a class="header" href="./chapter_5.html#a-hrefhttpsmasha-notegithubiokubernetes-analysechapter_5_1html51-为何需要poda" id="a-hrefhttpsmasha-notegithubiokubernetes-analysechapter_5_1html51-为何需要poda"><h2><a href="https://masha-note.github.io/kubernetes-analyse/chapter_5_1.html">5.1 为何需要Pod</a></h2></a>
+<a class="header" href="./chapter_5.html#a-hrefhttpsmasha-notegithubiokubernetes-analysechapter_5_2html52-深入解析pod对象a" id="a-hrefhttpsmasha-notegithubiokubernetes-analysechapter_5_2html52-深入解析pod对象a"><h2><a href="https://masha-note.github.io/kubernetes-analyse/chapter_5_2.html">5.2 深入解析Pod对象</a></h2></a>
 
                 </div>
 
                 <!-- Mobile navigation buttons -->
                 
-
-                
-                    <a rel="next" href="./chapter_2.html" class="mobile-nav-chapters next" title="Next chapter">
-                        <i class="fa fa-angle-right"></i>
+                    <a rel="prev" href="./chapter_4.html" class="mobile-nav-chapters previous" title="Previous chapter">
+                        <i class="fa fa-angle-left"></i>
                     </a>
+                
+
                 
 
             </div>
 
             
-
-            
-                <a href="./chapter_2.html" class="nav-chapters next" title="You can navigate through the chapters using the arrow keys">
-                    <i class="fa fa-angle-right"></i>
+                <a href="./chapter_4.html" class="nav-chapters previous" title="You can navigate through the chapters using the arrow keys">
+                    <i class="fa fa-angle-left"></i>
                 </a>
+            
+
             
 
         </div>

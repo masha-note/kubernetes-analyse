@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>《深入剖析Kubernetes》学习笔记</title>
+        <title>重新认识 Linux 容器 - 《深入剖析Kubernetes》学习笔记</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -63,7 +63,7 @@
         </script>
 
         <div id="sidebar" class="sidebar">
-            <ul class="chapter"><li><a href="./chapter_1.html"><strong>1.</strong> 背景</a></li><li><a href="./chapter_2.html"><strong>2.</strong> 容器技术基础</a></li><li><ul class="section"><li><a href="./chapter_2_4.html"><strong>2.1.</strong> 重新认识 Linux 容器</a></li></ul></li><li><a href="./chapter_3.html"><strong>3.</strong> kubernetes 设计与架构</a></li><li><a href="./chapter_4.html"><strong>4.</strong> kubernetes 集群搭建与配置</a></li><li><a href="./chapter_5.html"><strong>5.</strong> kubernetes 编排原理</a></li></ul>
+            <ul class="chapter"><li><a href="./chapter_1.html"><strong>1.</strong> 背景</a></li><li><a href="./chapter_2.html"><strong>2.</strong> 容器技术基础</a></li><li><ul class="section"><li><a href="./chapter_2_4.html" class="active"><strong>2.1.</strong> 重新认识 Linux 容器</a></li></ul></li><li><a href="./chapter_3.html"><strong>3.</strong> kubernetes 设计与架构</a></li><li><a href="./chapter_4.html"><strong>4.</strong> kubernetes 集群搭建与配置</a></li><li><a href="./chapter_5.html"><strong>5.</strong> kubernetes 编排原理</a></li></ul>
         </div>
 
         <div id="page-wrapper" class="page-wrapper">
@@ -86,16 +86,7 @@
                 </div>
 
                 <div id="content" class="content">
-                    <a class="header" href="print.html#1-背景回顾云原生大事记" id="1-背景回顾云原生大事记"><h1>1 背景回顾：云原生大事记</h1></a>
-<p>介绍了容器技术和PAAS的历史背景，讲的很通俗易懂，建议阅读原文第一章。</p>
-<a class="header" href="print.html#2-容器技术基础" id="2-容器技术基础"><h1>2 容器技术基础</h1></a>
-<p>由于docker版本更新以及阅读时本地环境和书中环境存在差异，许多示例无法正常运行，有待后续补充。</p>
-<p>内容中提及的概念可从<a href="https://docs.docker.com/manuals/">docker manual</a>获取详尽可靠的解释。</p>
-<a class="header" href="print.html#a-hrefhttpsmasha-notegithubiokubernetes-analysechapter_2_1html21-从进程开始说起a" id="a-hrefhttpsmasha-notegithubiokubernetes-analysechapter_2_1html21-从进程开始说起a"><h2><a href="https://masha-note.github.io/kubernetes-analyse/chapter_2_1.html">2.1 从进程开始说起</a></h2></a>
-<a class="header" href="print.html#a-hrefhttpsmasha-notegithubiokubernetes-analysechapter_2_2html22-隔离与限制a" id="a-hrefhttpsmasha-notegithubiokubernetes-analysechapter_2_2html22-隔离与限制a"><h2><a href="https://masha-note.github.io/kubernetes-analyse/chapter_2_2.html">2.2 隔离与限制</a></h2></a>
-<a class="header" href="print.html#a-hrefhttpsmasha-notegithubiokubernetes-analysechapter_2_3html23-深入理解容器镜像a" id="a-hrefhttpsmasha-notegithubiokubernetes-analysechapter_2_3html23-深入理解容器镜像a"><h2><a href="https://masha-note.github.io/kubernetes-analyse/chapter_2_3.html">2.3 深入理解容器镜像</a></h2></a>
-<a class="header" href="print.html#a-hrefhttpsmasha-notegithubiokubernetes-analysechapter_2_4html24-重新认识-linux-容器a" id="a-hrefhttpsmasha-notegithubiokubernetes-analysechapter_2_4html24-重新认识-linux-容器a"><h2><a href="https://masha-note.github.io/kubernetes-analyse/chapter_2_4.html">2.4 重新认识 Linux 容器</a></h2></a>
-<a class="header" href="print.html#重新认识-linux-容器" id="重新认识-linux-容器"><h1>重新认识 Linux 容器</h1></a>
+                    <a class="header" href="./chapter_2_4.html#重新认识-linux-容器" id="重新认识-linux-容器"><h1>重新认识 Linux 容器</h1></a>
 <p>编写一个 app.py，用 Flask 框架启动一个 web 服务器，打印一些相关信息。尝试用 docker 容器化这个应用。</p>
 <pre><code class="language-PYTHON">from flask import Flask
 import socket
@@ -189,11 +180,11 @@ lrwxrwxrwx 1 root root 0 7月  20 11:18 user -&gt; 'user:[4026531837]'
 lrwxrwxrwx 1 root root 0 7月  20 11:18 uts -&gt; 'uts:[4026532148]'
 </code></pre>
 <p>可以看到容器的 PID 是 92555，容器的所有文件都能在宿主机上找到。docker exec 进程通过加入一个已有的 namespace 从而达到进入容器的目的。</p>
-<a class="header" href="print.html#setns" id="setns"><h2>setns</h2></a>
+<a class="header" href="./chapter_2_4.html#setns" id="setns"><h2>setns</h2></a>
 <p>docker exec依赖一个名为setns的Linux系统调用，原文中的示例代码又不管用了。总之，我们打开一个namespace下的资源后，将文件描述符（fd）交给setns后，当前的进程就能加入到这个文件对应的namespace当中了。</p>
-<a class="header" href="print.html#docker-commit" id="docker-commit"><h2>docker commit</h2></a>
+<a class="header" href="./chapter_2_4.html#docker-commit" id="docker-commit"><h2>docker commit</h2></a>
 <p>因为UnionFS的使用，容器内对镜像rootfs的任何修改都会被操作系统先复制到可读可写层，然后再修改。docker commit把最上层的可读写层加上原先容器镜像的只读层打包成一个新镜像。而init层就是为了避免执行docker commit时把docker自己对/etc/hosts等文件做的修改一并提交。</p>
-<a class="header" href="print.html#docker-volume" id="docker-volume"><h2>docker volume</h2></a>
+<a class="header" href="./chapter_2_4.html#docker-volume" id="docker-volume"><h2>docker volume</h2></a>
 <p>volume机制允许将宿主机上指定的目录或文件挂载到容器中进行读取和修改。</p>
 <pre><code class="language-SEHLL">$ docker run -v /test ...
 $ docker run -v /home:/test ...
@@ -201,50 +192,38 @@ $ docker run -v /home:/test ...
 <p>第一种情况下， 由于没有显示声明，dockers会创建一个临时目录挂载（/var/lib/docker/volumes/[VOLUME_ID]/_data）到容器内的/test目录。</p>
 <p>这并不需要借助namespace，只需要在rootfs准备好之后，在执行chroot之前把Volume指定的宿主机目录（比如/home目录）挂载到指定的容器目录（比如/test目录）在宿主机上对应的目录上就完成了。</p>
 <p>由于执行这个操作的时候容器初始化进程已经启动，mount namespace已开启，这个挂载只对该容器可见。容器初始化进程会负责完成根目录的准备、挂载设备和目录、配置hostname等一系列需要在容器内进行的初始化操作。最后通过execv系统调用让应用进程取代自己成为容器里PID=1的进程。</p>
-<a class="header" href="print.html#bind-mount" id="bind-mount"><h2>bind mount</h2></a>
+<a class="header" href="./chapter_2_4.html#bind-mount" id="bind-mount"><h2>bind mount</h2></a>
 <p>docker volume中用到的挂载技术就是绑定挂载（bind mount）机制。其主要作用就是允许将一个目录或者文件而不是整个设备挂载到指定目录上。在linux内核中，绑定挂载实际上是一个inode替换的过程，inode可以理解为存放文件内容的“对象”。</p>
 <p><img src="./picture/chapter2/mount.png" alt="mount" /></p>
 <p>这样，修改了/test之后如果执行umount，/test下的内容就会恢复，因为修改实际发生在/home目录里。docker volume就是通过这样的挂载避免了容器运行时影响到镜像。</p>
-<a class="header" href="print.html#kubernetes设计与架构" id="kubernetes设计与架构"><h1>kubernetes设计与架构</h1></a>
-<p>容器镜像：一组联合挂载的rootfs，是容器的静态视图；</p>
-<p>容器运行时：Namespace+Cgroups构成的隔离环境，是容器的动态视图。</p>
-<p>kubernetes是一个容器编排项目。</p>
-<a class="header" href="print.html#kubernetes核心设计与架构" id="kubernetes核心设计与架构"><h2>kubernetes核心设计与架构</h2></a>
-<p>用户希望kubernetes带来的体验是确定的：用户提供容器镜像，由kubernetes运行在指定的集群上，此外还需要kubernetes提供路由网关、水平扩展、监控、备份、灾难恢复等一系列运维能力。</p>
-<p><img src="./picture/chapter3/architecture0.png" alt="Kubernetes Architecture" /></p>
-<p>从kubertes的架构可以看到，kubernetes由Master和Node两种节点组成，分别对应控制节点和计算节点。Master节点由3个紧密协作的独立组件组合而成，分别是<code>负责API服务的kube-apiserver</code>、<code>负责调度的kube-scheduler</code>，以及<code>负责容器编排的kube-controller-manager</code>。整个集群的持久化数据，则由kube-apiserver处理后保存在etcd中。</p>
-<p>计算节点上最核心的部分是一个名为kubelet的组件。在kubernetes项目中，kubelet主要负责同容器运行时（比如Docker项目）交互。而这种交互所依赖的是一个称作CRI（container runtime interface）的远程调用接口，该接口定义了容器运行时的各项核心操作，比如启动一个容器需要的所有参数。</p>
-<p>此外kubelet还通过gRPC协同一个叫做Device Plugin的插件进行交互。这是kubernetes用来管理GPU等宿主机物理设备的主要组件，也是基于kubernetes项目进行机器学习训练、高性能作业支持等工作必须关注的功能。</p>
-<p>kubelet的另一个重要功能则是调用网络插件和存储插件为容器配置网络和持久化存储。这两个插件与kubelet进行交互的接口分别是CNI（container networking interface）和CSI（container storage interface）。</p>
-<a class="header" href="print.html#kubernetes核心能力与项目定位" id="kubernetes核心能力与项目定位"><h2>kubernetes核心能力与项目定位</h2></a>
-<p>kubernetes项目着重要解决的问题：在大规模集群中的各种任务之间，实际上存在各种各样的关系。这些关系的处理才是作业编排和管理系统最困难的地方。</p>
-<p>kubernetes项目最主要的设计思想：以统一的方式抽象底层基础设施能力（比如计算、存储、网络），定义任务编排的各种关系，将这些抽象以声明式API的方式对外暴露，从而允许平台构建者基于这些抽象进一步构建自己的paas乃至任何上层平台。</p>
-<p>在常规环境中，应用通常会被直接部署在同一台机器中，通过localhost进行通信，通过本地磁盘目录交换文件。而在kubernetes中，这些应用会被划分为一个Pod，Pod里的容器共享同一个Network Namespace、同一组Volume从而实现高效的交互。Pod是kubernetes中最基础的一个对象。</p>
-<p>以此为基础延展出kubernetes的核心功能如下图。</p>
-<p><img src="./picture/chapter3/core_func.png" alt="核心功能" /></p>
-<p>kubernetes没有为每一个管理功能创建一条指令，然后实现其中的逻辑。其推崇的方法是：</p>
-<ul>
-<li>定义任务编排对象描述试图管理的应用</li>
-<li>为上面定义的对象定义运维能力对象</li>
-</ul>
-<p>这种使用方法就是所谓的“声明式API‘。这种API对应的编排对象和服务对象都是kubernetes中的API对象。这是kubernetes最核心的设计理念。</p>
-<a class="header" href="print.html#kubernetes集群搭建与配置" id="kubernetes集群搭建与配置"><h1>kubernetes集群搭建与配置</h1></a>
-<p>第四章介绍kubernetes集群的搭建，详情参考<a href="https://kubernetes.io/docs/setup/">Kubernetes: Getting started</a>。</p>
-<a class="header" href="print.html#kubernetes编排原理" id="kubernetes编排原理"><h1>kubernetes编排原理</h1></a>
-<a class="header" href="print.html#a-hrefhttpsmasha-notegithubiokubernetes-analysechapter_5_1html51-为何需要poda" id="a-hrefhttpsmasha-notegithubiokubernetes-analysechapter_5_1html51-为何需要poda"><h2><a href="https://masha-note.github.io/kubernetes-analyse/chapter_5_1.html">5.1 为何需要Pod</a></h2></a>
-<a class="header" href="print.html#a-hrefhttpsmasha-notegithubiokubernetes-analysechapter_5_2html52-深入解析pod对象a" id="a-hrefhttpsmasha-notegithubiokubernetes-analysechapter_5_2html52-深入解析pod对象a"><h2><a href="https://masha-note.github.io/kubernetes-analyse/chapter_5_2.html">5.2 深入解析Pod对象</a></h2></a>
 
                 </div>
 
                 <!-- Mobile navigation buttons -->
                 
+                    <a rel="prev" href="./chapter_2.html" class="mobile-nav-chapters previous" title="Previous chapter">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
 
+                
+                    <a rel="next" href="./chapter_3.html" class="mobile-nav-chapters next" title="Next chapter">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
                 
 
             </div>
 
             
+                <a href="./chapter_2.html" class="nav-chapters previous" title="You can navigate through the chapters using the arrow keys">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+            
 
+            
+                <a href="./chapter_3.html" class="nav-chapters next" title="You can navigate through the chapters using the arrow keys">
+                    <i class="fa fa-angle-right"></i>
+                </a>
             
 
         </div>
@@ -264,12 +243,6 @@ $ docker run -v /home:/test ...
 
         
 
-        
-        <script>
-            $(document).ready(function() {
-                window.print();
-            })
-        </script>
         
 
         <script src="highlight.js"></script>
