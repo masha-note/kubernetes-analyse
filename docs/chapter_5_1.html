@@ -1,0 +1,187 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>为何需要Pod - 《深入剖析Kubernetes》学习笔记</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <base href="">
+
+        <link rel="stylesheet" href="book.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <link rel="shortcut icon" href="favicon.png">
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme -->
+        
+
+        
+
+        <!-- Fetch Clipboard.js from CDN but have a local fallback -->
+        <script src="https://cdn.jsdelivr.net/clipboard.js/1.6.1/clipboard.min.js"></script>
+        <script>
+            if (typeof Clipboard == 'undefined') {
+                document.write(unescape("%3Cscript src='clipboard.min.js'%3E%3C/script%3E"));
+            }
+        </script>
+
+        <!-- Fetch JQuery from CDN but have a local fallback -->
+        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script>
+            if (typeof jQuery == 'undefined') {
+                document.write(unescape("%3Cscript src='jquery.js'%3E%3C/script%3E"));
+            }
+        </script>
+
+        <!-- Fetch store.js from local - TODO add CDN when 2.x.x is available on cdnjs -->
+        <script src="store.js"></script>
+
+    </head>
+    <body class="light">
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme = store.get('mdbook-theme');
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            $('body').removeClass().addClass(theme);
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var sidebar = store.get('mdbook-sidebar');
+            if (sidebar === "hidden") { $("html").addClass("sidebar-hidden") }
+            else if (sidebar === "visible") { $("html").addClass("sidebar-visible") }
+        </script>
+
+        <div id="sidebar" class="sidebar">
+            <ul class="chapter"><li><a href="./chapter_1.html"><strong>1.</strong> 背景</a></li><li><a href="./chapter_2.html"><strong>2.</strong> 容器技术基础</a></li><li><ul class="section"><li><a href="./chapter_2_1.html"><strong>2.1.</strong> 从进程开始说起</a></li><li><a href="./chapter_2_2.html"><strong>2.2.</strong> 隔离与限制</a></li><li><a href="./chapter_2_3.html"><strong>2.3.</strong> 深入理解容器镜像</a></li><li><a href="./chapter_2_4.html"><strong>2.4.</strong> 重新认识 Linux 容器</a></li></ul></li><li><a href="./chapter_3.html"><strong>3.</strong> kubernetes 设计与架构</a></li><li><a href="./chapter_4.html"><strong>4.</strong> kubernetes 集群搭建与配置</a></li><li><a href="./chapter_5.html"><strong>5.</strong> kubernetes 编排原理</a></li><li><ul class="section"><li><a href="./chapter_5_1.html" class="active"><strong>5.1.</strong> 为何需要Pod</a></li><li><a href="./chapter_5_2.html"><strong>5.2.</strong> 深入解析Pod对象</a></li></ul></li></ul>
+        </div>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page" tabindex="-1">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div class="left-buttons">
+                        <i id="sidebar-toggle" class="fa fa-bars" title="Toggle sidebar"></i>
+                        <i id="theme-toggle" class="fa fa-paint-brush" title="Change theme"></i>
+                    </div>
+
+                    <h1 class="menu-title">《深入剖析Kubernetes》学习笔记</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html">
+                            <i id="print-button" class="fa fa-print" title="Print this book"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="content" class="content">
+                    <a class="header" href="./chapter_5_1.html#为何需要pod" id="为何需要pod"><h1>为何需要Pod</h1></a>
+<p>容器的“单进程模型”并不是指容器里只能运行“一个进程”，二十至容器无法管理多个进程。这是因为容器里PID=1的进程就是应用本身，其他进程都是这个PID=1进程的子进程。</p>
+<p>Pod是kubernetes里原子调度单位，kubernetes项目的调度器是统一按照Pod而非容器的资源需求进行计算的。Pod也是kubernetes的容器设计模式的基础。</p>
+<p>Pod是一个逻辑概念，它实际上是一组共享了某些资源的容器，kubernetes真正处理的还是宿主机操作系统上Linux容器的Namespace和Cgroups，并不存在所谓Pod的边界或者隔离环境。</p>
+<p>Pod里的所有容器都共享一个Network Namespace，并且可以声明共享同一个Volume。于此同时，为了防止容器间的依赖导致不对等，Pod使用一个Infra容器来作为第一个被创建的容器。用户定义的其他容器则通过加入Network Namespace的方式与Infra容器关联在一起。Infra容器占用极少的资源，使用一个非常特殊的镜像，叫做<code>k8s.gcr.io/pause</code>。这个镜像是用汇编语言写的、永远处于“暂停”状态的容器。</p>
+<p>在Infra容器开辟了一个Network Namespace后，用户容器就可以加入这个Namespace中。对于这些容器来说：</p>
+<ul>
+<li>它们可以直接使用loclahost进行通信</li>
+<li>它们共享网络设备</li>
+<li>一个pod只有一个ip地址，也就是这个pod的Network Namespace对应的IP地址</li>
+<li>pod的生命周期只跟Infra容器一致，与其他容器无关</li>
+</ul>
+<p>对于同一个Pod里的所有用户容器来说，他们的进出流量也可以认为都是通过Infra容器完成的。这一点很重要，因为将来如果你要为kubernetes开发一个网络插件，应该重点考虑如何配置这个Pod的Network Namespace，而不是每一个用户容器如何使用你的网络配置，这是没有意义的。</p>
+<p>这意味着，如果你的网络插件需要在容器里安装某些包或者配置才能完成，是不可取的：Infra容器镜像的rootfs里几乎什么都没有，无法随意发挥。当然，这也意味着网络插件只需要关注如何配置Pod，也就是Infra容器的Network Namespace即可。</p>
+<p>kubernetes只要把所有的Volume的定义都设计在Pod层级即可在Pod中的容器间共享Volume。这样，一个Volume对应的宿主机目录对于Pod来说只有一个，Pod里的容器只要声明挂载这个Volume就一定可以共享这个Volume对应的宿主机目录。示例如下：</p>
+<pre><code class="language-YAML">apiVersion: v1
+kind: Pod
+metadata:
+  name: two-containers
+spec:
+  restartPolicy: Never
+  volumes:
+  - name: shared-data
+    hostPath:
+      path: /data
+  containers:
+  - name: nginx-container
+    image: nginx
+    volumeMounts:
+      - mountPath: /usr/share/nginx/html
+        name: shared-data
+  - name: debian-container
+    image: debian
+    volumeMounts:
+    - mountPath: /pod-data
+      name: shared-data
+    command: [&quot;/bin/sh&quot;]
+    args: [&quot;-c&quot;, &quot;echo Hello from the debian container &gt; /pod-data/index.html&quot;]
+</code></pre>
+<p>在这个例子中，debian-container和nginx-container都声明挂载了shared-data这个Volume。而shared-data是hostPath类型，所以它在宿主机上的对应目录就是/data。而这个目录其实被同时绑定挂载进了上述两个容器中。这就是nginx-container可以从它的目录中读取到debian-container生成的index.html文件的原因。</p>
+<p>容器设计模式实际上就是希望，当用户想在一个容器里运行多个功能无关的应用时，应该优先考虑他们是否更应该被描述成一个Pod里的多个容器。</p>
+<p>这个过程中，会涉及到Init Container。所有的Init Container都会比spec.containers定义的用户容器先启动。并且，Init Container会按顺序注意启动，直到他们都启动并且退出了，用户容器才会启动。这种Init Container和用户容器组合的方式成为sidecar。通常用Init Container来完成一些独立于用户进程的工作。</p>
+
+                </div>
+
+                <!-- Mobile navigation buttons -->
+                
+                    <a rel="prev" href="./chapter_5.html" class="mobile-nav-chapters previous" title="Previous chapter">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="./chapter_5_2.html" class="mobile-nav-chapters next" title="Next chapter">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+
+            </div>
+
+            
+                <a href="./chapter_5.html" class="nav-chapters previous" title="You can navigate through the chapters using the arrow keys">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+            
+
+            
+                <a href="./chapter_5_2.html" class="nav-chapters next" title="You can navigate through the chapters using the arrow keys">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            
+
+        </div>
+
+
+        <!-- Local fallback for Font Awesome -->
+        <script>
+            if ($(".fa").css("font-family") !== "FontAwesome") {
+                $('<link rel="stylesheet" type="text/css" href="_FontAwesome/css/font-awesome.css">').prependTo('head');
+            }
+        </script>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        
+
+        
+
+        
+
+        
+
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS script -->
+        
+
+    </body>
+</html>
