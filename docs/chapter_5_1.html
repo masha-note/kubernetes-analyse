@@ -63,7 +63,7 @@
         </script>
 
         <div id="sidebar" class="sidebar">
-            <ul class="chapter"><li><a href="./chapter_1.html"><strong>1.</strong> 背景</a></li><li><a href="./chapter_2.html"><strong>2.</strong> 容器技术基础</a></li><li><ul class="section"><li><a href="./chapter_2_1.html"><strong>2.1.</strong> 从进程开始说起</a></li><li><a href="./chapter_2_2.html"><strong>2.2.</strong> 隔离与限制</a></li><li><a href="./chapter_2_3.html"><strong>2.3.</strong> 深入理解容器镜像</a></li><li><a href="./chapter_2_4.html"><strong>2.4.</strong> 重新认识 Linux 容器</a></li></ul></li><li><a href="./chapter_3.html"><strong>3.</strong> kubernetes 设计与架构</a></li><li><a href="./chapter_4.html"><strong>4.</strong> kubernetes 集群搭建与配置</a></li><li><a href="./chapter_5.html"><strong>5.</strong> kubernetes 编排原理</a></li><li><ul class="section"><li><a href="./chapter_5_1.html" class="active"><strong>5.1.</strong> 为何需要Pod</a></li><li><a href="./chapter_5_2.html"><strong>5.2.</strong> 深入解析Pod对象</a></li></ul></li></ul>
+            <ul class="chapter"><li><a href="./chapter_1.html"><strong>1.</strong> 背景</a></li><li><a href="./chapter_2.html"><strong>2.</strong> 容器技术基础</a></li><li><ul class="section"><li><a href="./chapter_2_1.html"><strong>2.1.</strong> 从进程开始说起</a></li><li><a href="./chapter_2_2.html"><strong>2.2.</strong> 隔离与限制</a></li><li><a href="./chapter_2_3.html"><strong>2.3.</strong> 深入理解容器镜像</a></li><li><a href="./chapter_2_4.html"><strong>2.4.</strong> 重新认识 Linux 容器</a></li></ul></li><li><a href="./chapter_3.html"><strong>3.</strong> kubernetes 设计与架构</a></li><li><a href="./chapter_4.html"><strong>4.</strong> kubernetes 集群搭建与配置</a></li><li><a href="./chapter_5.html"><strong>5.</strong> kubernetes 编排原理</a></li><li><ul class="section"><li><a href="./chapter_5_1.html" class="active"><strong>5.1.</strong> 为何需要Pod</a></li><li><a href="./chapter_5_2.html"><strong>5.2.</strong> 深入解析Pod对象</a></li><li><a href="./chapter_5_3.html"><strong>5.3.</strong> Pod对象使用进阶</a></li></ul></li></ul>
         </div>
 
         <div id="page-wrapper" class="page-wrapper">
@@ -87,7 +87,7 @@
 
                 <div id="content" class="content">
                     <a class="header" href="./chapter_5_1.html#为何需要pod" id="为何需要pod"><h1>为何需要Pod</h1></a>
-<p>容器的“单进程模型”并不是指容器里只能运行“一个进程”，二十至容器无法管理多个进程。这是因为容器里PID=1的进程就是应用本身，其他进程都是这个PID=1进程的子进程。</p>
+<p>容器的“单进程模型”并不是指容器里只能运行“一个进程”，而是指容器无法管理多个进程。这是因为容器里PID=1的进程就是应用本身，其他进程都是这个PID=1进程的子进程。</p>
 <p>Pod是kubernetes里原子调度单位，kubernetes项目的调度器是统一按照Pod而非容器的资源需求进行计算的。Pod也是kubernetes的容器设计模式的基础。</p>
 <p>Pod是一个逻辑概念，它实际上是一组共享了某些资源的容器，kubernetes真正处理的还是宿主机操作系统上Linux容器的Namespace和Cgroups，并不存在所谓Pod的边界或者隔离环境。</p>
 <p>Pod里的所有容器都共享一个Network Namespace，并且可以声明共享同一个Volume。于此同时，为了防止容器间的依赖导致不对等，Pod使用一个Infra容器来作为第一个被创建的容器。用户定义的其他容器则通过加入Network Namespace的方式与Infra容器关联在一起。Infra容器占用极少的资源，使用一个非常特殊的镜像，叫做<code>k8s.gcr.io/pause</code>。这个镜像是用汇编语言写的、永远处于“暂停”状态的容器。</p>

@@ -1,0 +1,198 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Pod对象使用进阶 - 《深入剖析Kubernetes》学习笔记</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <base href="">
+
+        <link rel="stylesheet" href="book.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <link rel="shortcut icon" href="favicon.png">
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme -->
+        
+
+        
+
+        <!-- Fetch Clipboard.js from CDN but have a local fallback -->
+        <script src="https://cdn.jsdelivr.net/clipboard.js/1.6.1/clipboard.min.js"></script>
+        <script>
+            if (typeof Clipboard == 'undefined') {
+                document.write(unescape("%3Cscript src='clipboard.min.js'%3E%3C/script%3E"));
+            }
+        </script>
+
+        <!-- Fetch JQuery from CDN but have a local fallback -->
+        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script>
+            if (typeof jQuery == 'undefined') {
+                document.write(unescape("%3Cscript src='jquery.js'%3E%3C/script%3E"));
+            }
+        </script>
+
+        <!-- Fetch store.js from local - TODO add CDN when 2.x.x is available on cdnjs -->
+        <script src="store.js"></script>
+
+    </head>
+    <body class="light">
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme = store.get('mdbook-theme');
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            $('body').removeClass().addClass(theme);
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var sidebar = store.get('mdbook-sidebar');
+            if (sidebar === "hidden") { $("html").addClass("sidebar-hidden") }
+            else if (sidebar === "visible") { $("html").addClass("sidebar-visible") }
+        </script>
+
+        <div id="sidebar" class="sidebar">
+            <ul class="chapter"><li><a href="./chapter_1.html"><strong>1.</strong> 背景</a></li><li><a href="./chapter_2.html"><strong>2.</strong> 容器技术基础</a></li><li><ul class="section"><li><a href="./chapter_2_1.html"><strong>2.1.</strong> 从进程开始说起</a></li><li><a href="./chapter_2_2.html"><strong>2.2.</strong> 隔离与限制</a></li><li><a href="./chapter_2_3.html"><strong>2.3.</strong> 深入理解容器镜像</a></li><li><a href="./chapter_2_4.html"><strong>2.4.</strong> 重新认识 Linux 容器</a></li></ul></li><li><a href="./chapter_3.html"><strong>3.</strong> kubernetes 设计与架构</a></li><li><a href="./chapter_4.html"><strong>4.</strong> kubernetes 集群搭建与配置</a></li><li><a href="./chapter_5.html"><strong>5.</strong> kubernetes 编排原理</a></li><li><ul class="section"><li><a href="./chapter_5_1.html"><strong>5.1.</strong> 为何需要Pod</a></li><li><a href="./chapter_5_2.html"><strong>5.2.</strong> 深入解析Pod对象</a></li><li><a href="./chapter_5_3.html" class="active"><strong>5.3.</strong> Pod对象使用进阶</a></li></ul></li></ul>
+        </div>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page" tabindex="-1">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div class="left-buttons">
+                        <i id="sidebar-toggle" class="fa fa-bars" title="Toggle sidebar"></i>
+                        <i id="theme-toggle" class="fa fa-paint-brush" title="Change theme"></i>
+                    </div>
+
+                    <h1 class="menu-title">《深入剖析Kubernetes》学习笔记</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html">
+                            <i id="print-button" class="fa fa-print" title="Print this book"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="content" class="content">
+                    <a class="header" href="./chapter_5_3.html#pod对象使用进阶" id="pod对象使用进阶"><h1>Pod对象使用进阶</h1></a>
+<p>kubernetes中的projected volume是一种特殊的volume。他们既不用于容器和宿主机之间的数据交换也不用来存放容器里的数据，而是为容器提供预先定义好的数据。</p>
+<a class="header" href="./chapter_5_3.html#projected-volume" id="projected-volume"><h2>Projected Volume</h2></a>
+<p>在这本书写成的时候，Kubernetes支持的常用Projected Volume共有以下4种：<code>Secret</code>、<code>ConfigMap</code>、<code>Downward API</code>、<code>ServiceAccountToken</code>。</p>
+<ol>
+<li>Secret</li>
+</ol>
+<p>Secret可以把Pod想要访问的加密数据存放到etcd中，容器可以通过挂载这个Volume来访问这些Secret里保存的信息。</p>
+<p>下面是一个典型的用Secret存放数据库Credential的典型场景。</p>
+<pre><code class="language-YAML">apiVersion: v1
+kind: Pod
+metadata:
+  name: test-projected-volume
+spec:
+  volumes:
+  - name: mysql-cred
+    projected:
+      sources:
+      - secret:
+          name: user
+      - secret:
+          name: pass
+  containers:
+  - name: test-secret-volume
+    image: busybox
+    args:
+    - sleep
+    - &quot;86400&quot;
+    volumeMounts:
+    - name: mysql-cred
+      mountPath: &quot;/projected-volume&quot;
+      readOnly: true
+</code></pre>
+<p>这里声明挂载的Volume是projected类型。这个Volume的数据来源是名为user和pass的Secret的对象，分别对应数据库的用户名和密码。</p>
+<p>Secret对象可以用下面的方法创建：</p>
+<pre><code class="language-SHELL">$ cat ./username.txt
+admin
+$ cat ./password.txt
+961110
+$ kubectl create secret generic user --from-file=./username.txt
+$ kubectl create secret generic pass --from-file=./password.txt
+</code></pre>
+<p>username.txt和password.txt文件里存放的就是用户名和密码，user和pass则是为Secret对象指定的名字。可以通过如下命令查看。</p>
+<pre><code class="language-SHELL">$ kubectl get secrets
+NAME        TYPE        DATA    AGE
+user        Opaque      1       53s
+pass        Opaque      1       52s
+</code></pre>
+<p>此外，还可以直接通过编写YAML文件来创建这个Secret对象。</p>
+<pre><code class="language-YAML">apiVersion: v1
+kind: Secret
+metadata:
+  name: mysecret
+type: Opaque
+data:
+  user: YWRtaW4=
+  password: MWYyZDF1MmU2N2Rm
+</code></pre>
+<p>这个yaml文件创建出来的Secret对象只有一个，但它的data字段以k-v的格式保存了两份Secret数据。其中的内容经过了Base64转码：<code>echo -n 'admin' | base64</code>。</p>
+<p>在真正的生产环境中，需要在kubernetes中开启Secret的加密插件，增强数据的安全性。</p>
+<p>像这样通过挂载方式进入容器的Secret，一旦其对应的etcd里的数据更新，这些Volume里的文件内容也会更新（kubelet组件在定时维护这些Volume，这通常会有一定的延时，需要做好重试和超时）。</p>
+
+                </div>
+
+                <!-- Mobile navigation buttons -->
+                
+                    <a rel="prev" href="./chapter_5_2.html" class="mobile-nav-chapters previous" title="Previous chapter">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+
+            </div>
+
+            
+                <a href="./chapter_5_2.html" class="nav-chapters previous" title="You can navigate through the chapters using the arrow keys">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+            
+
+            
+
+        </div>
+
+
+        <!-- Local fallback for Font Awesome -->
+        <script>
+            if ($(".fa").css("font-family") !== "FontAwesome") {
+                $('<link rel="stylesheet" type="text/css" href="_FontAwesome/css/font-awesome.css">').prependTo('head');
+            }
+        </script>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        
+
+        
+
+        
+
+        
+
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS script -->
+        
+
+    </body>
+</html>

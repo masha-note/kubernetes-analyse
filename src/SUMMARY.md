@@ -11,3 +11,4 @@
 - [kubernetes 编排原理](./chapter_5.md)
     - [为何需要Pod](./chapter_5_1.md)
     - [深入解析Pod对象](./chapter_5_2.md)
+    - [Pod对象使用进阶](./chapter_5_3.md)
