@@ -69,4 +69,6 @@ int pid = clone(main_function, stack_size, CLONE_NEWPID | SIGCHLD, NULL);
     One use of namespaces is to implement containers.
     ```
 
+Linux为一个Namespace抽象封装系统资源，不同Namespace中的进程可以有相同的进程ID，这些进程拥有独立的系统资源，这些资源只在同一个Namespace中共享。
+
 这就是Linux容器最基本的实现原理。可见，容器其实是一种特殊的进程。

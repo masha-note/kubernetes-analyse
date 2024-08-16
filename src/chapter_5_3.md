@@ -6,7 +6,7 @@ kubernetes中的projected volume是一种特殊的volume。他们既不用于容
 
 在这本书写成的时候，Kubernetes支持的常用Projected Volume共有以下4种：`Secret`、`ConfigMap`、`Downward API`、`ServiceAccountToken`。
 
-1. Secret
+### Secret
 
 Secret可以把Pod想要访问的加密数据存放到etcd中，容器可以通过挂载这个Volume来访问这些Secret里保存的信息。
 
@@ -79,7 +79,7 @@ data:
 
 像这样通过挂载方式进入容器的Secret，一旦其对应的etcd里的数据更新，这些Volume里的文件内容也会更新（kubelet组件在定时维护这些Volume，这通常会有一定的延时，需要做好重试和超时）。
 
-
+### ConfigMap
 
 
 
