@@ -90,9 +90,7 @@
 <p>kubernetes中的projected volume是一种特殊的volume。他们既不用于容器和宿主机之间的数据交换也不用来存放容器里的数据，而是为容器提供预先定义好的数据。</p>
 <a class="header" href="./chapter_5_3.html#projected-volume" id="projected-volume"><h2>Projected Volume</h2></a>
 <p>在这本书写成的时候，Kubernetes支持的常用Projected Volume共有以下4种：<code>Secret</code>、<code>ConfigMap</code>、<code>Downward API</code>、<code>ServiceAccountToken</code>。</p>
-<ol>
-<li>Secret</li>
-</ol>
+<a class="header" href="./chapter_5_3.html#secret" id="secret"><h3>Secret</h3></a>
 <p>Secret可以把Pod想要访问的加密数据存放到etcd中，容器可以通过挂载这个Volume来访问这些Secret里保存的信息。</p>
 <p>下面是一个典型的用Secret存放数据库Credential的典型场景。</p>
 <pre><code class="language-YAML">apiVersion: v1
@@ -147,6 +145,7 @@ data:
 <p>这个yaml文件创建出来的Secret对象只有一个，但它的data字段以k-v的格式保存了两份Secret数据。其中的内容经过了Base64转码：<code>echo -n 'admin' | base64</code>。</p>
 <p>在真正的生产环境中，需要在kubernetes中开启Secret的加密插件，增强数据的安全性。</p>
 <p>像这样通过挂载方式进入容器的Secret，一旦其对应的etcd里的数据更新，这些Volume里的文件内容也会更新（kubelet组件在定时维护这些Volume，这通常会有一定的延时，需要做好重试和超时）。</p>
+<a class="header" href="./chapter_5_3.html#configmap" id="configmap"><h3>ConfigMap</h3></a>
 
                 </div>
 
