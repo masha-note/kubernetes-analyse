@@ -1,94 +1,181 @@
 <!DOCTYPE HTML>
-<html lang="en">
+<html lang="zh" class="light" dir="ltr">
     <head>
+        <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>深入理解容器镜像 - 《深入剖析Kubernetes》学习笔记</title>
-        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+
+
+        <!-- Custom HTML head -->
+        
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
 
-        <base href="">
-
-        <link rel="stylesheet" href="book.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
-
+        <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
 
-        <!-- Font Awesome -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
 
+        <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
         <link rel="stylesheet" href="tomorrow-night.css">
         <link rel="stylesheet" href="ayu-highlight.css">
 
-        <!-- Custom theme -->
-        
-
-        
-
-        <!-- Fetch Clipboard.js from CDN but have a local fallback -->
-        <script src="https://cdn.jsdelivr.net/clipboard.js/1.6.1/clipboard.min.js"></script>
-        <script>
-            if (typeof Clipboard == 'undefined') {
-                document.write(unescape("%3Cscript src='clipboard.min.js'%3E%3C/script%3E"));
-            }
-        </script>
-
-        <!-- Fetch JQuery from CDN but have a local fallback -->
-        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-        <script>
-            if (typeof jQuery == 'undefined') {
-                document.write(unescape("%3Cscript src='jquery.js'%3E%3C/script%3E"));
-            }
-        </script>
-
-        <!-- Fetch store.js from local - TODO add CDN when 2.x.x is available on cdnjs -->
-        <script src="store.js"></script>
+        <!-- Custom theme stylesheets -->
 
     </head>
-    <body class="light">
-        <!-- Set the theme before any content is loaded, prevents flash -->
-        <script type="text/javascript">
-            var theme = store.get('mdbook-theme');
-            if (theme === null || theme === undefined) { theme = 'light'; }
-            $('body').removeClass().addClass(theme);
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
 
         <!-- Hide / unhide sidebar before it is displayed -->
-        <script type="text/javascript">
-            var sidebar = store.get('mdbook-sidebar');
-            if (sidebar === "hidden") { $("html").addClass("sidebar-hidden") }
-            else if (sidebar === "visible") { $("html").addClass("sidebar-visible") }
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
         </script>
 
-        <div id="sidebar" class="sidebar">
-            <ul class="chapter"><li><a href="./chapter_1.html"><strong>1.</strong> 背景</a></li><li><a href="./chapter_2.html"><strong>2.</strong> 容器技术基础</a></li><li><ul class="section"><li><a href="./chapter_2_1.html"><strong>2.1.</strong> 从进程开始说起</a></li><li><a href="./chapter_2_2.html"><strong>2.2.</strong> 隔离与限制</a></li><li><a href="./chapter_2_3.html" class="active"><strong>2.3.</strong> 深入理解容器镜像</a></li><li><a href="./chapter_2_4.html"><strong>2.4.</strong> 重新认识 Linux 容器</a></li></ul></li><li><a href="./chapter_3.html"><strong>3.</strong> kubernetes 设计与架构</a></li><li><a href="./chapter_4.html"><strong>4.</strong> kubernetes 集群搭建与配置</a></li><li><a href="./chapter_5.html"><strong>5.</strong> kubernetes 编排原理</a></li><li><ul class="section"><li><a href="./chapter_5_1.html"><strong>5.1.</strong> 为何需要Pod</a></li><li><a href="./chapter_5_2.html"><strong>5.2.</strong> 深入解析Pod对象</a></li><li><a href="./chapter_5_3.html"><strong>5.3.</strong> Pod对象使用进阶</a></li></ul></li></ul>
-        </div>
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> 背景</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">2.</strong> 容器技术基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="chapter_2_1.html"><strong aria-hidden="true">2.1.</strong> 从进程开始说起</a></li><li class="chapter-item expanded "><a href="chapter_2_2.html"><strong aria-hidden="true">2.2.</strong> 隔离与限制</a></li><li class="chapter-item expanded "><a href="chapter_2_3.html" class="active"><strong aria-hidden="true">2.3.</strong> 深入理解容器镜像</a></li><li class="chapter-item expanded "><a href="chapter_2_4.html"><strong aria-hidden="true">2.4.</strong> 重新认识 Linux 容器</a></li></ol></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">3.</strong> kubernetes 设计与架构</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">4.</strong> kubernetes 集群搭建与配置</a></li><li class="chapter-item expanded "><a href="chapter_5.html"><strong aria-hidden="true">5.</strong> kubernetes 编排原理</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="chapter_5_1.html"><strong aria-hidden="true">5.1.</strong> 为何需要Pod</a></li><li class="chapter-item expanded "><a href="chapter_5_2.html"><strong aria-hidden="true">5.2.</strong> 深入解析Pod对象</a></li><li class="chapter-item expanded "><a href="chapter_5_3.html"><strong aria-hidden="true">5.3.</strong> Pod对象使用进阶</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
 
         <div id="page-wrapper" class="page-wrapper">
 
-            <div class="page" tabindex="-1">
-                
-                <div id="menu-bar" class="menu-bar">
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
                     <div class="left-buttons">
-                        <i id="sidebar-toggle" class="fa fa-bars" title="Toggle sidebar"></i>
-                        <i id="theme-toggle" class="fa fa-paint-brush" title="Change theme"></i>
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
                     </div>
 
                     <h1 class="menu-title">《深入剖析Kubernetes》学习笔记</h1>
 
                     <div class="right-buttons">
-                        <a href="print.html">
-                            <i id="print-button" class="fa fa-print" title="Print this book"></i>
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
                         </a>
+
                     </div>
                 </div>
 
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
                 <div id="content" class="content">
-                    <a class="header" href="./chapter_2_3.html#23-深入理解容器镜像" id="23-深入理解容器镜像"><h1>2.3 深入理解容器镜像</h1></a>
+                    <main>
+                        <h1 id="23-深入理解容器镜像"><a class="header" href="#23-深入理解容器镜像">2.3 深入理解容器镜像</a></h1>
 <p>Namespace的作用是“隔离”；而Cgroups的作用是“限制”。此外还需要一个文件系统，这应该是一个关于Mount Namespace的问题：容器里的应用进程理应“看到”一套完全独立的文件系统。这样他就可以在自己的容器目录（比如/tmp）下进行操作，而完全不会受宿主机以及其他容器的影响。</p>
-<a class="header" href="./chapter_2_3.html#mount-namespace" id="mount-namespace"><h2>Mount Namespace</h2></a>
+<h2 id="mount-namespace"><a class="header" href="#mount-namespace">Mount Namespace</a></h2>
 <p>借鉴“左耳朵耗子”的博客里的一小段用于在创建子进程时是开启指定的Namespace。</p>
 <pre><code class="language-C">#define _GNU_SOURCE
 #include &lt;sys/mount.h&gt;
@@ -102,22 +189,22 @@
 #define STACK_SIZE (1024 * 1024)
 static char container_stack[STACK_SIZE];
 
-char *const container_args[] = {&quot;/bin/bash&quot;, NULL};
+char *const container_args[] = {"/bin/bash", NULL};
 
 int container_main(void *arg)
 {
-    printf(&quot;Container - inside the container!\n&quot;);
+    printf("Container - inside the container!\n");
     execv(container_args[0], container_args);
-    printf(&quot;Something's wrong!\n&quot;);
+    printf("Something's wrong!\n");
     return 1;
 }
 
 int main()
 {
-    printf(&quot;Parent - start a container!\n&quot;);
+    printf("Parent - start a container!\n");
     int container_pid = clone(container_main, container_stack + STACK_SIZE, CLONE_NEWNS | SIGCHLD, NULL);
     waitpid(container_pid, NULL, 0);
-    printf(&quot;Parent - container stopped!\n&quot;);
+    printf("Parent - container stopped!\n");
     return 0;
 }
 
@@ -129,14 +216,14 @@ Parent - start a container!
 Parent - container stopped!
 </code></pre>
 <p>按照预期，这里应该进入容器，但是实际却是没有开启那个进程，需要排查代码。</p>
-<a class="header" href="./chapter_2_3.html#问题排查" id="问题排查"><h3>问题排查</h3></a>
+<h3 id="问题排查"><a class="header" href="#问题排查">问题排查</a></h3>
 <p>改写之前的main函数如下，打印错误信息。</p>
 <pre><code class="language-C">int main() {
-    printf(&quot;Parent - start a container!\n&quot;);
+    printf("Parent - start a container!\n");
     int container_pid = clone(container_main, container_stack + STACK_SIZE, CLONE_NEWNS | SIGCHLD, NULL);
-    perror(&quot;error message:&quot;);
+    perror("error message:");
     waitpid(container_pid, NULL, 0);
-    printf(&quot;Parent - container stopped!\n&quot;);
+    printf("Parent - container stopped!\n");
     return 0;
 }
 </code></pre>
@@ -204,18 +291,18 @@ appInsights-nodeAIF-d9b70cd4-b9f9-4d70-929b-a071c400b217
 tracker-extract-files.1000
 vscode-typescript1000
 </code></pre>
-<a class="header" href="./chapter_2_3.html#mount" id="mount"><h2>mount</h2></a>
+<h2 id="mount"><a class="header" href="#mount">mount</a></h2>
 <p>预期情况下，进入容器后查看/tmp目录下的文件，会看到很多宿主机上的东西，也就是说即便开启了Mount Namespace，容器进程访问到的文件系统也跟宿主机完全一样（根据mount_namespace的man的描述，子进程的namespace中的挂载点是父进程namespace的copy）。</p>
-<p>这是因为：Mount Namespace修改的是容器进程对文件系统“挂载点”的认知。这意味着<strong><em>只有在“挂载”这个操作发生之后，进程的视图才会改变；而在此之前，新创建的容器会直接集成宿主机的各个挂载点</em></strong>。</p>
+<p>这是因为：Mount Namespace修改的是容器进程对文件系统“挂载点”的认知。这意味着<em><strong>只有在“挂载”这个操作发生之后，进程的视图才会改变；而在此之前，新创建的容器会直接集成宿主机的各个挂载点</strong></em>。</p>
 <p>如果在容器进程启动之前以tmpfs（内存盘）格式重新挂载/tmp目录（这相当于覆写了从父进程的namespace中拷贝来的挂载点）。</p>
 <pre><code class="language-C">int container_main(void *arg)
 {
-    printf(&quot;Container - inside the container!\n&quot;);
+    printf("Container - inside the container!\n");
     // 如果机器的根目录的挂载类型是shared，那必须重新挂载根目录
-    // mount(&quot;&quot;, &quot;/&quot;, NULL, MS_PRIVATE, &quot;&quot;);
-    mount(&quot;none&quot;, &quot;/tmp&quot;, &quot;tmpfs&quot;, 0, &quot;&quot;);
+    // mount("", "/", NULL, MS_PRIVATE, "");
+    mount("none", "/tmp", "tmpfs", 0, "");
     execv(container_args[0], container_args);
-    printf(&quot;Something's wrong!\n&quot;);
+    printf("Something's wrong!\n");
     return 1;
 }
 </code></pre>
@@ -232,7 +319,7 @@ exit
 Parent - container stopped!
 </code></pre>
 <p>可以看到，/tmp变成了一个空目录，这意味这重新挂载生效了。通过mount -l可以看到容器里的/tmp目录是以tempfs方式单独挂载的。更重要的是，因为创建的新进程启用了Mount Namespace，所以这次重新挂载的操作旨在容器进程的Mount Namespace中有效。如果在宿主机上用mount -l检查挂载就会发现它不存在。</p>
-<a class="header" href="./chapter_2_3.html#chroot" id="chroot"><h2>chroot</h2></a>
+<h2 id="chroot"><a class="header" href="#chroot">chroot</a></h2>
 <p><code>chroot &lt;目录&gt; &lt;程序&gt;</code>可以改变程序的根目录为指定的目录。一般将一个完整操作系统的文件系统（比如Ubuntu的ISO）指定为容器进程的根目录，这个文件系统就是所谓的“容器镜像”，或叫rootfs（根文件系统）。</p>
 <p>Docker的核心原理：</p>
 <ol>
@@ -240,65 +327,60 @@ Parent - container stopped!
 <li>设置指定的Cgroups参数；</li>
 <li>切换进程的根目录（优先使用pivot_root，其次才是chroot）。</li>
 </ol>
-<a class="header" href="./chapter_2_3.html#unionfs" id="unionfs"><h2>UnionFS</h2></a>
+<h2 id="unionfs"><a class="header" href="#unionfs">UnionFS</a></h2>
 <p>rootfs是一个文件系统，并不包含操作系统内核，容器配置、使用的依旧是宿主的操作系统内核。</p>
 <p>rootfs可以打包整个文件系统，以此来确保应用的一致性（一致的执行环境）。为了保证rootfs的可复用性，docker镜像设计中引入了层（layer）的概念，镜像制作中的每一步都会生成一个层（增量rootfs）。</p>
 <p>这使用到了UnionFS（union file system，联合文件系统）的能力，其功能是将不同位置的目录联合挂载（union mount）到同一个目录下。对挂载后的目录中的修改也会在挂载源的目录中生效。</p>
 <p>作者原文中介绍的<a href="https://docs.docker.com/storage/storagedriver/aufs-driver/">AUFS</a>已经被标注为Deprecated。我的系统中docker使用的是<a href="https://docs.docker.com/storage/storagedriver/overlayfs-driver/">overlay2</a>，更多unionfs参考<a href="https://docs.docker.com/storage/storagedriver/select-storage-driver/">Docker storage drivers</a>。</p>
 
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="chapter_2_2.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="chapter_2_4.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
                 </div>
-
-                <!-- Mobile navigation buttons -->
-                
-                    <a rel="prev" href="./chapter_2_2.html" class="mobile-nav-chapters previous" title="Previous chapter">
-                        <i class="fa fa-angle-left"></i>
-                    </a>
-                
-
-                
-                    <a rel="next" href="./chapter_2_4.html" class="mobile-nav-chapters next" title="Next chapter">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
-                
-
             </div>
 
-            
-                <a href="./chapter_2_2.html" class="nav-chapters previous" title="You can navigate through the chapters using the arrow keys">
-                    <i class="fa fa-angle-left"></i>
-                </a>
-            
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="chapter_2_2.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
-            
-                <a href="./chapter_2_4.html" class="nav-chapters next" title="You can navigate through the chapters using the arrow keys">
-                    <i class="fa fa-angle-right"></i>
-                </a>
-            
+                    <a rel="next prefetch" href="chapter_2_4.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
 
         </div>
 
 
-        <!-- Local fallback for Font Awesome -->
+
+
         <script>
-            if ($(".fa").css("font-family") !== "FontAwesome") {
-                $('<link rel="stylesheet" type="text/css" href="_FontAwesome/css/font-awesome.css">').prependTo('head');
-            }
+            window.playground_copyable = true;
         </script>
 
-        <!-- Livereload script (if served using the cli tool) -->
-        
 
-        
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
 
-        
-
-        
-
+        <script src="clipboard.min.js"></script>
         <script src="highlight.js"></script>
         <script src="book.js"></script>
 
-        <!-- Custom JS script -->
-        
+        <!-- Custom JS scripts -->
 
+
+    </div>
     </body>
 </html>

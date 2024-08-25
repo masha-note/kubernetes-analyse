@@ -1,92 +1,179 @@
 <!DOCTYPE HTML>
-<html lang="en">
+<html lang="zh" class="light" dir="ltr">
     <head>
+        <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>重新认识 Linux 容器 - 《深入剖析Kubernetes》学习笔记</title>
-        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+
+
+        <!-- Custom HTML head -->
+        
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
 
-        <base href="">
-
-        <link rel="stylesheet" href="book.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
-
+        <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
 
-        <!-- Font Awesome -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
 
+        <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
         <link rel="stylesheet" href="tomorrow-night.css">
         <link rel="stylesheet" href="ayu-highlight.css">
 
-        <!-- Custom theme -->
-        
-
-        
-
-        <!-- Fetch Clipboard.js from CDN but have a local fallback -->
-        <script src="https://cdn.jsdelivr.net/clipboard.js/1.6.1/clipboard.min.js"></script>
-        <script>
-            if (typeof Clipboard == 'undefined') {
-                document.write(unescape("%3Cscript src='clipboard.min.js'%3E%3C/script%3E"));
-            }
-        </script>
-
-        <!-- Fetch JQuery from CDN but have a local fallback -->
-        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-        <script>
-            if (typeof jQuery == 'undefined') {
-                document.write(unescape("%3Cscript src='jquery.js'%3E%3C/script%3E"));
-            }
-        </script>
-
-        <!-- Fetch store.js from local - TODO add CDN when 2.x.x is available on cdnjs -->
-        <script src="store.js"></script>
+        <!-- Custom theme stylesheets -->
 
     </head>
-    <body class="light">
-        <!-- Set the theme before any content is loaded, prevents flash -->
-        <script type="text/javascript">
-            var theme = store.get('mdbook-theme');
-            if (theme === null || theme === undefined) { theme = 'light'; }
-            $('body').removeClass().addClass(theme);
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
 
         <!-- Hide / unhide sidebar before it is displayed -->
-        <script type="text/javascript">
-            var sidebar = store.get('mdbook-sidebar');
-            if (sidebar === "hidden") { $("html").addClass("sidebar-hidden") }
-            else if (sidebar === "visible") { $("html").addClass("sidebar-visible") }
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
         </script>
 
-        <div id="sidebar" class="sidebar">
-            <ul class="chapter"><li><a href="./chapter_1.html"><strong>1.</strong> 背景</a></li><li><a href="./chapter_2.html"><strong>2.</strong> 容器技术基础</a></li><li><ul class="section"><li><a href="./chapter_2_1.html"><strong>2.1.</strong> 从进程开始说起</a></li><li><a href="./chapter_2_2.html"><strong>2.2.</strong> 隔离与限制</a></li><li><a href="./chapter_2_3.html"><strong>2.3.</strong> 深入理解容器镜像</a></li><li><a href="./chapter_2_4.html" class="active"><strong>2.4.</strong> 重新认识 Linux 容器</a></li></ul></li><li><a href="./chapter_3.html"><strong>3.</strong> kubernetes 设计与架构</a></li><li><a href="./chapter_4.html"><strong>4.</strong> kubernetes 集群搭建与配置</a></li><li><a href="./chapter_5.html"><strong>5.</strong> kubernetes 编排原理</a></li><li><ul class="section"><li><a href="./chapter_5_1.html"><strong>5.1.</strong> 为何需要Pod</a></li><li><a href="./chapter_5_2.html"><strong>5.2.</strong> 深入解析Pod对象</a></li><li><a href="./chapter_5_3.html"><strong>5.3.</strong> Pod对象使用进阶</a></li></ul></li></ul>
-        </div>
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> 背景</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">2.</strong> 容器技术基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="chapter_2_1.html"><strong aria-hidden="true">2.1.</strong> 从进程开始说起</a></li><li class="chapter-item expanded "><a href="chapter_2_2.html"><strong aria-hidden="true">2.2.</strong> 隔离与限制</a></li><li class="chapter-item expanded "><a href="chapter_2_3.html"><strong aria-hidden="true">2.3.</strong> 深入理解容器镜像</a></li><li class="chapter-item expanded "><a href="chapter_2_4.html" class="active"><strong aria-hidden="true">2.4.</strong> 重新认识 Linux 容器</a></li></ol></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">3.</strong> kubernetes 设计与架构</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">4.</strong> kubernetes 集群搭建与配置</a></li><li class="chapter-item expanded "><a href="chapter_5.html"><strong aria-hidden="true">5.</strong> kubernetes 编排原理</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="chapter_5_1.html"><strong aria-hidden="true">5.1.</strong> 为何需要Pod</a></li><li class="chapter-item expanded "><a href="chapter_5_2.html"><strong aria-hidden="true">5.2.</strong> 深入解析Pod对象</a></li><li class="chapter-item expanded "><a href="chapter_5_3.html"><strong aria-hidden="true">5.3.</strong> Pod对象使用进阶</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
 
         <div id="page-wrapper" class="page-wrapper">
 
-            <div class="page" tabindex="-1">
-                
-                <div id="menu-bar" class="menu-bar">
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
                     <div class="left-buttons">
-                        <i id="sidebar-toggle" class="fa fa-bars" title="Toggle sidebar"></i>
-                        <i id="theme-toggle" class="fa fa-paint-brush" title="Change theme"></i>
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
                     </div>
 
                     <h1 class="menu-title">《深入剖析Kubernetes》学习笔记</h1>
 
                     <div class="right-buttons">
-                        <a href="print.html">
-                            <i id="print-button" class="fa fa-print" title="Print this book"></i>
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
                         </a>
+
                     </div>
                 </div>
 
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
                 <div id="content" class="content">
-                    <a class="header" href="./chapter_2_4.html#重新认识-linux-容器" id="重新认识-linux-容器"><h1>重新认识 Linux 容器</h1></a>
+                    <main>
+                        <h1 id="重新认识-linux-容器"><a class="header" href="#重新认识-linux-容器">重新认识 Linux 容器</a></h1>
 <p>编写一个 app.py，用 Flask 框架启动一个 web 服务器，打印一些相关信息。尝试用 docker 容器化这个应用。</p>
 <pre><code class="language-PYTHON">from flask import Flask
 import socket
@@ -96,10 +183,10 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    html = &quot;&lt;h3&gt;Hello!&lt;/h3&gt;&lt;b&gt;Hostname:&lt;/b&gt; {hostname}&lt;br/&gt;&quot;
-    return html.format(name=os.getenv(&quot;NAME&quot;, &quot;world&quot;),hostname=socket.gethostname())
+    html = "&lt;h3&gt;Hello!&lt;/h3&gt;&lt;b&gt;Hostname:&lt;/b&gt; {hostname}&lt;br/&gt;"
+    return html.format(name=os.getenv("NAME", "world"),hostname=socket.gethostname())
 
-if __name__ == &quot;__main__&quot;:
+if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)
 </code></pre>
 <p>Docker 提供了一种便捷的制作 rootfs 的方式：Dockerfile。</p>
@@ -122,9 +209,9 @@ EXPOSE 80
 ENV NAME World
 
 # 设置容器进程为：python app.py
-CMD [&quot;python&quot;, &quot;app.py&quot;]
+CMD ["python", "app.py"]
 </code></pre>
-<p>其中大写高亮的部分是 Dockerfile 的原语，按顺序处理。更多详情参考<a href="https://docs.docker.com/build/building/best-practices/#:%7E:text=What%20is%20a%20Dockerfile%3F,can%20find%20at%20Dockerfile%20reference.">Dockerfile</a>。</p>
+<p>其中大写高亮的部分是 Dockerfile 的原语，按顺序处理。更多详情参考<a href="https://docs.docker.com/build/building/best-practices/#:~:text=What%20is%20a%20Dockerfile%3F,can%20find%20at%20Dockerfile%20reference.">Dockerfile</a>。</p>
 <p>完成后当前的目录结构为</p>
 <pre><code class="language-SHELL">$ ls
 app.py  dockerfile  requirements.txt
@@ -139,7 +226,7 @@ helloworld                   latest                                           2b
 
 # -p 4000:80 将容器内的80端口映射在宿主机的4000端口上
 $ docker run -p 4000:80 helloworld
- * Serving Flask app &quot;app&quot; (lazy loading)
+ * Serving Flask app "app" (lazy loading)
  * Environment: production
    WARNING: This is a development server. Do not use it in a production deployment.
    Use a production WSGI server instead.
@@ -153,7 +240,7 @@ $ docker run -p 4000:80 helloworld
 <p>可以通过 exec 子命令进入容器，commit 子命令可以将修改提交到镜像中保存</p>
 <pre><code class="language-SHELL">$ docker ps
 CONTAINER ID   IMAGE        COMMAND           CREATED          STATUS          PORTS                                   NAMES
-751738a54ef1   helloworld   &quot;python app.py&quot;   12 seconds ago   Up 11 seconds   0.0.0.0:4000-&gt;80/tcp, :::4000-&gt;80/tcp   recursing_wright
+751738a54ef1   helloworld   "python app.py"   12 seconds ago   Up 11 seconds   0.0.0.0:4000-&gt;80/tcp, :::4000-&gt;80/tcp   recursing_wright
 $ docker exec -it 751738a54ef1 /bin/bash
 root@751738a54ef1:/app# touch test.txt
 root@751738a54ef1:/app# exit
@@ -163,7 +250,7 @@ $ docker commit -it 751738a54ef1 imagename:tag
 <p>Namesapce 之间虽然是隔离的，但是他们的信息在宿主机上都是实际存在的。</p>
 <pre><code class="language-SHELL">$ docker ps
 CONTAINER ID   IMAGE        COMMAND           CREATED         STATUS         PORTS                                   NAMES
-1a7077cf6e7c   helloworld   &quot;python app.py&quot;   6 seconds ago   Up 6 seconds   0.0.0.0:4000-&gt;80/tcp, :::4000-&gt;80/tcp   heuristic_keller
+1a7077cf6e7c   helloworld   "python app.py"   6 seconds ago   Up 6 seconds   0.0.0.0:4000-&gt;80/tcp, :::4000-&gt;80/tcp   heuristic_keller
 $ docker inspect --format '{{.State.Pid}}' 1a7077cf6e7c
 92555
 $ ls -l /proc/92555/ns
@@ -180,11 +267,11 @@ lrwxrwxrwx 1 root root 0 7月  20 11:18 user -&gt; 'user:[4026531837]'
 lrwxrwxrwx 1 root root 0 7月  20 11:18 uts -&gt; 'uts:[4026532148]'
 </code></pre>
 <p>可以看到容器的 PID 是 92555，容器的所有文件都能在宿主机上找到。docker exec 进程通过加入一个已有的 namespace 从而达到进入容器的目的。</p>
-<a class="header" href="./chapter_2_4.html#setns" id="setns"><h2>setns</h2></a>
+<h2 id="setns"><a class="header" href="#setns">setns</a></h2>
 <p>docker exec依赖一个名为setns的Linux系统调用，原文中的示例代码又不管用了。总之，我们打开一个namespace下的资源后，将文件描述符（fd）交给setns后，当前的进程就能加入到这个文件对应的namespace当中了。</p>
-<a class="header" href="./chapter_2_4.html#docker-commit" id="docker-commit"><h2>docker commit</h2></a>
+<h2 id="docker-commit"><a class="header" href="#docker-commit">docker commit</a></h2>
 <p>因为UnionFS的使用，容器内对镜像rootfs的任何修改都会被操作系统先复制到可读可写层，然后再修改。docker commit把最上层的可读写层加上原先容器镜像的只读层打包成一个新镜像。而init层就是为了避免执行docker commit时把docker自己对/etc/hosts等文件做的修改一并提交。</p>
-<a class="header" href="./chapter_2_4.html#docker-volume" id="docker-volume"><h2>docker volume</h2></a>
+<h2 id="docker-volume"><a class="header" href="#docker-volume">docker volume</a></h2>
 <p>volume机制允许将宿主机上指定的目录或文件挂载到容器中进行读取和修改。</p>
 <pre><code class="language-SEHLL">$ docker run -v /test ...
 $ docker run -v /home:/test ...
@@ -192,64 +279,59 @@ $ docker run -v /home:/test ...
 <p>第一种情况下， 由于没有显示声明，dockers会创建一个临时目录挂载（/var/lib/docker/volumes/[VOLUME_ID]/_data）到容器内的/test目录。</p>
 <p>这并不需要借助namespace，只需要在rootfs准备好之后，在执行chroot之前把Volume指定的宿主机目录（比如/home目录）挂载到指定的容器目录（比如/test目录）在宿主机上对应的目录上就完成了。</p>
 <p>由于执行这个操作的时候容器初始化进程已经启动，mount namespace已开启，这个挂载只对该容器可见。容器初始化进程会负责完成根目录的准备、挂载设备和目录、配置hostname等一系列需要在容器内进行的初始化操作。最后通过execv系统调用让应用进程取代自己成为容器里PID=1的进程。</p>
-<a class="header" href="./chapter_2_4.html#bind-mount" id="bind-mount"><h2>bind mount</h2></a>
+<h2 id="bind-mount"><a class="header" href="#bind-mount">bind mount</a></h2>
 <p>docker volume中用到的挂载技术就是绑定挂载（bind mount）机制。其主要作用就是允许将一个目录或者文件而不是整个设备挂载到指定目录上。在linux内核中，绑定挂载实际上是一个inode替换的过程，inode可以理解为存放文件内容的“对象”。</p>
 <p><img src="./picture/chapter2/mount.png" alt="mount" /></p>
 <p>这样，修改了/test之后如果执行umount，/test下的内容就会恢复，因为修改实际发生在/home目录里。docker volume就是通过这样的挂载避免了容器运行时影响到镜像。</p>
 
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="chapter_2_3.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="chapter_3.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
                 </div>
-
-                <!-- Mobile navigation buttons -->
-                
-                    <a rel="prev" href="./chapter_2_3.html" class="mobile-nav-chapters previous" title="Previous chapter">
-                        <i class="fa fa-angle-left"></i>
-                    </a>
-                
-
-                
-                    <a rel="next" href="./chapter_3.html" class="mobile-nav-chapters next" title="Next chapter">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
-                
-
             </div>
 
-            
-                <a href="./chapter_2_3.html" class="nav-chapters previous" title="You can navigate through the chapters using the arrow keys">
-                    <i class="fa fa-angle-left"></i>
-                </a>
-            
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="chapter_2_3.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
-            
-                <a href="./chapter_3.html" class="nav-chapters next" title="You can navigate through the chapters using the arrow keys">
-                    <i class="fa fa-angle-right"></i>
-                </a>
-            
+                    <a rel="next prefetch" href="chapter_3.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
 
         </div>
 
 
-        <!-- Local fallback for Font Awesome -->
+
+
         <script>
-            if ($(".fa").css("font-family") !== "FontAwesome") {
-                $('<link rel="stylesheet" type="text/css" href="_FontAwesome/css/font-awesome.css">').prependTo('head');
-            }
+            window.playground_copyable = true;
         </script>
 
-        <!-- Livereload script (if served using the cli tool) -->
-        
 
-        
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
 
-        
-
-        
-
+        <script src="clipboard.min.js"></script>
         <script src="highlight.js"></script>
         <script src="book.js"></script>
 
-        <!-- Custom JS script -->
-        
+        <!-- Custom JS scripts -->
 
+
+    </div>
     </body>
 </html>

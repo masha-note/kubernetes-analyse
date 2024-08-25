@@ -1,95 +1,182 @@
 <!DOCTYPE HTML>
-<html lang="en">
+<html lang="zh" class="light" dir="ltr">
     <head>
+        <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>深入解析Pod对象 - 《深入剖析Kubernetes》学习笔记</title>
-        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+
+
+        <!-- Custom HTML head -->
+        
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
 
-        <base href="">
-
-        <link rel="stylesheet" href="book.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
-
+        <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
 
-        <!-- Font Awesome -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
 
+        <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
         <link rel="stylesheet" href="tomorrow-night.css">
         <link rel="stylesheet" href="ayu-highlight.css">
 
-        <!-- Custom theme -->
-        
-
-        
-
-        <!-- Fetch Clipboard.js from CDN but have a local fallback -->
-        <script src="https://cdn.jsdelivr.net/clipboard.js/1.6.1/clipboard.min.js"></script>
-        <script>
-            if (typeof Clipboard == 'undefined') {
-                document.write(unescape("%3Cscript src='clipboard.min.js'%3E%3C/script%3E"));
-            }
-        </script>
-
-        <!-- Fetch JQuery from CDN but have a local fallback -->
-        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-        <script>
-            if (typeof jQuery == 'undefined') {
-                document.write(unescape("%3Cscript src='jquery.js'%3E%3C/script%3E"));
-            }
-        </script>
-
-        <!-- Fetch store.js from local - TODO add CDN when 2.x.x is available on cdnjs -->
-        <script src="store.js"></script>
+        <!-- Custom theme stylesheets -->
 
     </head>
-    <body class="light">
-        <!-- Set the theme before any content is loaded, prevents flash -->
-        <script type="text/javascript">
-            var theme = store.get('mdbook-theme');
-            if (theme === null || theme === undefined) { theme = 'light'; }
-            $('body').removeClass().addClass(theme);
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
 
         <!-- Hide / unhide sidebar before it is displayed -->
-        <script type="text/javascript">
-            var sidebar = store.get('mdbook-sidebar');
-            if (sidebar === "hidden") { $("html").addClass("sidebar-hidden") }
-            else if (sidebar === "visible") { $("html").addClass("sidebar-visible") }
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
         </script>
 
-        <div id="sidebar" class="sidebar">
-            <ul class="chapter"><li><a href="./chapter_1.html"><strong>1.</strong> 背景</a></li><li><a href="./chapter_2.html"><strong>2.</strong> 容器技术基础</a></li><li><ul class="section"><li><a href="./chapter_2_1.html"><strong>2.1.</strong> 从进程开始说起</a></li><li><a href="./chapter_2_2.html"><strong>2.2.</strong> 隔离与限制</a></li><li><a href="./chapter_2_3.html"><strong>2.3.</strong> 深入理解容器镜像</a></li><li><a href="./chapter_2_4.html"><strong>2.4.</strong> 重新认识 Linux 容器</a></li></ul></li><li><a href="./chapter_3.html"><strong>3.</strong> kubernetes 设计与架构</a></li><li><a href="./chapter_4.html"><strong>4.</strong> kubernetes 集群搭建与配置</a></li><li><a href="./chapter_5.html"><strong>5.</strong> kubernetes 编排原理</a></li><li><ul class="section"><li><a href="./chapter_5_1.html"><strong>5.1.</strong> 为何需要Pod</a></li><li><a href="./chapter_5_2.html" class="active"><strong>5.2.</strong> 深入解析Pod对象</a></li><li><a href="./chapter_5_3.html"><strong>5.3.</strong> Pod对象使用进阶</a></li></ul></li></ul>
-        </div>
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> 背景</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">2.</strong> 容器技术基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="chapter_2_1.html"><strong aria-hidden="true">2.1.</strong> 从进程开始说起</a></li><li class="chapter-item expanded "><a href="chapter_2_2.html"><strong aria-hidden="true">2.2.</strong> 隔离与限制</a></li><li class="chapter-item expanded "><a href="chapter_2_3.html"><strong aria-hidden="true">2.3.</strong> 深入理解容器镜像</a></li><li class="chapter-item expanded "><a href="chapter_2_4.html"><strong aria-hidden="true">2.4.</strong> 重新认识 Linux 容器</a></li></ol></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">3.</strong> kubernetes 设计与架构</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">4.</strong> kubernetes 集群搭建与配置</a></li><li class="chapter-item expanded "><a href="chapter_5.html"><strong aria-hidden="true">5.</strong> kubernetes 编排原理</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="chapter_5_1.html"><strong aria-hidden="true">5.1.</strong> 为何需要Pod</a></li><li class="chapter-item expanded "><a href="chapter_5_2.html" class="active"><strong aria-hidden="true">5.2.</strong> 深入解析Pod对象</a></li><li class="chapter-item expanded "><a href="chapter_5_3.html"><strong aria-hidden="true">5.3.</strong> Pod对象使用进阶</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
 
         <div id="page-wrapper" class="page-wrapper">
 
-            <div class="page" tabindex="-1">
-                
-                <div id="menu-bar" class="menu-bar">
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
                     <div class="left-buttons">
-                        <i id="sidebar-toggle" class="fa fa-bars" title="Toggle sidebar"></i>
-                        <i id="theme-toggle" class="fa fa-paint-brush" title="Change theme"></i>
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
                     </div>
 
                     <h1 class="menu-title">《深入剖析Kubernetes》学习笔记</h1>
 
                     <div class="right-buttons">
-                        <a href="print.html">
-                            <i id="print-button" class="fa fa-print" title="Print this book"></i>
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
                         </a>
+
                     </div>
                 </div>
 
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
                 <div id="content" class="content">
-                    <a class="header" href="./chapter_5_2.html#深入解析pod对象" id="深入解析pod对象"><h1>深入解析Pod对象</h1></a>
+                    <main>
+                        <h1 id="深入解析pod对象"><a class="header" href="#深入解析pod对象">深入解析Pod对象</a></h1>
 <p>kubernetes项目中最小编排单位是Pod，而Container就成了Pod属性里的一个普通字段。</p>
 <p>凡是调度、网络、存储，以及安全相关的属性基本上都是Pod级别的。这些属性的共同特征是，他们描述的是“机器”这个整体，而不是里面运行的“程序”。比如配置这台“机器”的网卡（Pod的网络定义），配置这台“机器”的磁盘（Pod的存储定义），配置这台“机器”的防火墙（Pod的安全定义），更不用说Pod的调度。</p>
-<a class="header" href="./chapter_5_2.html#nodeselector" id="nodeselector"><h2>NodeSelector</h2></a>
+<h2 id="nodeselector"><a class="header" href="#nodeselector">NodeSelector</a></h2>
 <p>用户可以通过NodeSelector将Pod与Node进行绑定，用法如下：</p>
 <pre><code class="language-YAML">apiVersion: v1
 kind: Pod
@@ -99,7 +186,7 @@ spec:
     disktype: disk
 </code></pre>
 <p>者意味着这个Pod只能在携带了<code>disktype: disk</code>标签的节点上运行，否则将导致调度失败。</p>
-<a class="header" href="./chapter_5_2.html#nodename" id="nodename"><h2>NodeName</h2></a>
+<h2 id="nodename"><a class="header" href="#nodename">NodeName</a></h2>
 <p>一旦Pod的nodeName赋了值，kubernetes会认为这个Pod已调度，调度的结果就是赋值的节点名称。所以这个字段一般由调度器负责设置。</p>
 <pre><code class="language-YAML">apiVersion: v1
 kind: Pod
@@ -107,17 +194,17 @@ kind: Pod
 spec:
   nodeName: myapp
 </code></pre>
-<a class="header" href="./chapter_5_2.html#hostaliases" id="hostaliases"><h2>HostAliases</h2></a>
+<h2 id="hostaliases"><a class="header" href="#hostaliases">HostAliases</a></h2>
 <p>hostAliases定义了Pod的hosts文件（比如/etc/hosts）里的内容。</p>
 <pre><code class="language-YAML">apiVersion: v1
 kind: Pod
 ...
 spec:
   hostAliases:
-  - ip: &quot;10.1.2.3&quot;
+  - ip: "10.1.2.3"
 </code></pre>
 <p>在这个Pod启动后，/etc/hosts文件的内容就会是hostAliases中所指定的。需要注意的是如果要设置hosts文件里的内容，—定要通过这种方法。如果直接修改了hosts文件，在Pod被删除重建之后，kubelet会自动覆盖被修改的内容。</p>
-<a class="header" href="./chapter_5_2.html#shareprocessnamespace" id="shareprocessnamespace"><h2>shareProcessNamespace</h2></a>
+<h2 id="shareprocessnamespace"><a class="header" href="#shareprocessnamespace">shareProcessNamespace</a></h2>
 <p>定义shareProcessNamespace=true表示这个Pod里的容器要共享PID Namespace。</p>
 <pre><code class="language-YAML">apiVersion: v1
 kind: Pod
@@ -125,7 +212,7 @@ kind: Pod
 spec:
   shareProcessNamespace: true
 </code></pre>
-<a class="header" href="./chapter_5_2.html#共享宿主机的namespace" id="共享宿主机的namespace"><h2>共享宿主机的Namespace</h2></a>
+<h2 id="共享宿主机的namespace"><a class="header" href="#共享宿主机的namespace">共享宿主机的Namespace</a></h2>
 <p>如下定义共享宿主机的Network、IPC和PID Namespace。这就意味着，这个Pod里所有的容器会直接使用宿主机的网络，直接与宿主机进行IPC通信，能访问宿主机的进程。</p>
 <pre><code class="language-YAML">apiVersion: v1
 kind: Pod
@@ -135,13 +222,13 @@ spec:
   hostIPC: true
   hostPID: true
 </code></pre>
-<a class="header" href="./chapter_5_2.html#containers" id="containers"><h2>Containers</h2></a>
+<h2 id="containers"><a class="header" href="#containers">Containers</a></h2>
 <p>Pod里最重要的字段当属Containers。包括Init Containers，他们都属于Pod对容器的定义，内容也完全相同，知识Init Containers的生命周期会先于所有Containers，并且严格按照定义的顺序执行。</p>
-<a class="header" href="./chapter_5_2.html#imagepullpolicy" id="imagepullpolicy"><h3>ImagePullPolicy</h3></a>
+<h3 id="imagepullpolicy"><a class="header" href="#imagepullpolicy">ImagePullPolicy</a></h3>
 <p>ImagePullPolicy是Container级别的属性，定义了镜像拉取策略，默认值是Always，即每次创建Pod都要重新拉取一次镜像。</p>
 <p>另外，当容器镜像是类似于nginx或者nginx:latest这样的名字时，ImagePullPolicy也会被认为是Always。</p>
 <p>如果ImagePullPolicy被指定为Never或者IfNotPresent，则意味着Pod永远不会主动拉取这个镜像，或者只在宿主机上不存在这个镜像时才拉取。</p>
-<a class="header" href="./chapter_5_2.html#lifecycle" id="lifecycle"><h3>Lifecycle</h3></a>
+<h3 id="lifecycle"><a class="header" href="#lifecycle">Lifecycle</a></h3>
 <p>lifecycle定义的是Container Lifecycle Hooks，也就是在容器状态发生变化时触发一系列“钩子”。例如：</p>
 <pre><code class="language-YAML">apiVersion: v1
 kind: Pod
@@ -154,16 +241,16 @@ spec:
     # postStart不严格保证顺序
       postStart:
         exec:
-         command: [&quot;sh&quot;, &quot;-c&quot;, &quot;echo 'PostStart hook executed.'&quot;]
+         command: ["sh", "-c", "echo 'PostStart hook executed.'"]
     # preStop中的语句执行完之后容器才能退出
     preStop:
         exec:
-         command: [&quot;/usr/sbin/nginx&quot;, &quot;-s&quot;, &quot;quit&quot;]
+         command: ["/usr/sbin/nginx", "-s", "quit"]
 </code></pre>
 <p>postStart指的是在容器启动后立刻执行一个指定操作。postStart定义的操作虽然是在Docker容器ENTRYPOINT执行之后，但它并不严格保证顺序。也就是说在postStart启动时ENTRYPOINT有可能尚未结束。</p>
 <p>当然，如果postStart执行超时或出错，kubernetes会在该Pod的Events中报出该容器启动失败的错误信息，导致Pod也处于失败状态。</p>
 <p>类似的，preStop发生的时机则是容器被结束之前（比如收到了SIGKILL信号）。需要明确的是，preStop操作的执行是同步的。所以，这会阻塞当前的容器结束流程，直到这个Hook定义操作完成之后，才允许容器被结束，这跟postStart不同。</p>
-<a class="header" href="./chapter_5_2.html#pod对象的生命周期" id="pod对象的生命周期"><h2>Pod对象的生命周期</h2></a>
+<h2 id="pod对象的生命周期"><a class="header" href="#pod对象的生命周期">Pod对象的生命周期</a></h2>
 <p><code>Pending</code>。这个状态意味着Pod的YAML文件已经提交给Kubernetes，API对象已经被创建并保存到etcd中。但是这个Pod里有些容器因为某种原因不能被顺利创建，比如调度失败。</p>
 <p><code>Running</code>。这个状态下，Pod已经调度成功，跟一个具体的节点绑定。它包含的容器都已经创建成功，并且至少有一个正在运行。</p>
 <p><code>Succeeded</code>。这个状态意味着Pod里的所有容器都正常运行完毕，并且已经退出了。这种情况在运行一次性任务时最常见。</p>
@@ -173,59 +260,54 @@ spec:
 <p>比如Pod当前的Status是Pending，对应的Condition是Unschedulable，这就意味着它的调度出现了问题。</p>
 <p>其中Ready这个细分状态意味着Pod不仅已经正常启动（Running状态），而且可以对外提供服务了。这两者（Running和Ready）之间是有区别的。</p>
 
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="chapter_5_1.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="chapter_5_3.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
                 </div>
-
-                <!-- Mobile navigation buttons -->
-                
-                    <a rel="prev" href="./chapter_5_1.html" class="mobile-nav-chapters previous" title="Previous chapter">
-                        <i class="fa fa-angle-left"></i>
-                    </a>
-                
-
-                
-                    <a rel="next" href="./chapter_5_3.html" class="mobile-nav-chapters next" title="Next chapter">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
-                
-
             </div>
 
-            
-                <a href="./chapter_5_1.html" class="nav-chapters previous" title="You can navigate through the chapters using the arrow keys">
-                    <i class="fa fa-angle-left"></i>
-                </a>
-            
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="chapter_5_1.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
-            
-                <a href="./chapter_5_3.html" class="nav-chapters next" title="You can navigate through the chapters using the arrow keys">
-                    <i class="fa fa-angle-right"></i>
-                </a>
-            
+                    <a rel="next prefetch" href="chapter_5_3.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
 
         </div>
 
 
-        <!-- Local fallback for Font Awesome -->
+
+
         <script>
-            if ($(".fa").css("font-family") !== "FontAwesome") {
-                $('<link rel="stylesheet" type="text/css" href="_FontAwesome/css/font-awesome.css">').prependTo('head');
-            }
+            window.playground_copyable = true;
         </script>
 
-        <!-- Livereload script (if served using the cli tool) -->
-        
 
-        
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
 
-        
-
-        
-
+        <script src="clipboard.min.js"></script>
         <script src="highlight.js"></script>
         <script src="book.js"></script>
 
-        <!-- Custom JS script -->
-        
+        <!-- Custom JS scripts -->
 
+
+    </div>
     </body>
 </html>
