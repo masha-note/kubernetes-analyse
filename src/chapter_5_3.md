@@ -178,9 +178,33 @@ status.hostIP——Node的IP
 
 需要注意的是，Downward API能够获取的信息一定是Pod里的容器进程启动之前就能够确定下来的信息。如果想要获取Pod容器运行后才会出现的信息，比如容器的PID，就无法使用Downward API而应该考虑sidecar容器。
 
+### ServiceAccountToken
 
+Service Account对象是kubernetes系统内置的一种“服务账户”，是kubernetes进行权限分配的对象。
 
+Service Account的授权信息和文件，实际上保存在它所绑定的一个特殊的Secret对象里。这个特殊的Secret对象叫做ServiceAccountToken。任何在kubernetes集群上运行的应用都必须使用ServiceAccountToken里保存的授权信息才可以合法地访问API Server。
 
+kubernetes提供了一个默认的Service Account，任何一个在kubernetes里运行的Pod都可以直接使用而无需显示声明挂载。
+
+```YAML
+$ kubectl describe pod nginx-deployment-fs1d654gh4-dw5a4
+...
+Containers:
+...
+Volumes:
+    default-token-df5g4:
+    Type:       Secret (a volume populated by a Secret)
+    SecretName: default-token-df5g4
+    Optional:   false
+```
+
+这个Secret类型的Volume正是默认的Service Account对应的ServiceAccountToken。所以在每个Pod创建的时候kubernetes会自动在它的spec.volumes部分添加默认ServiceAccountToken的定义然后挂载到每个容器里面。
+
+这样，一旦Pod创建完成，容器里的应用就可以直接从默认ServiceAccountToken的挂载目录里访问授权信息和文件。这个容器内的路径在kubernetes里是固定的：/var/run/secrets/kubernetes.io/serviceaccount。（kubernetes官方的client包可以自动加载这个目录下的文件从而访问kubernetes API）
+
+这种把kubernetes客户端以容器的方式在集群里运行然后使用默认Service Account自动授权的方式称为“InClusterConfig”。
+
+## 容器的健康检查和恢复机制
 
 
 
