@@ -206,11 +206,40 @@ Volumes:
 
 ## 容器的健康检查和恢复机制
 
+kubernetes中可以为Pod里的容器定义一个健康检查“探针”（Probe）。kubelet就会根据Probe的返回值决定这个容器的状态而不是直接以容器是否运行（来自Docker返回的信息）作为依据。
 
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp
+  labels:
+    name: myapp
+spec:
+  containers:
+  - name: myapp
+    image: <Image>
+    args:
+    - /bin/sh
+    - -c
+    - touch /tmp/healthy; sleep 30; rm -rf /tmp/healthy; sleep 600
+    livenessProbe:
+      exec:
+        command:
+          - cat
+          - /tmp/healthy
+      initialDelaySeconds: 5
+      periodSeconds: 5
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+```
 
+这样一个pod会在myapp这个容器启动的时候在/tmp目录下创建一个healthy文件，30秒后删除。
 
+而容器内的livenessProbe（健康检查）。它的类型是exec，这可以在容器启动后执行自定义的指令，这里选择的是cat /tmp/healthy。如果文件存在就会返回0，Pod就会认为该容器已经启动并且是健康的。这个健康检查在容器启动5s后开始执行，每5s执行一次。
 
-
-
+需要注意的是，kubernetes中并没有Docker的Stop语义。kubernetes的restartPolicy是pod的spec的一个标准字段，默认为Always，表示无论这个容器何时发生异常都会重建。
 
 
